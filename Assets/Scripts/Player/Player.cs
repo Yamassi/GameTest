@@ -80,7 +80,14 @@ namespace Player
         private void Mouse()
         {
             LookUp();
-            HighlightPickableItems();
+            if (_isPickedUp)
+            {
+                HighlightConstructItems();
+            }
+            else
+            {
+                HighlightPickableItems();
+            }
         }
 
         private void Interact(RaycastHit hit)
@@ -105,11 +112,12 @@ namespace Player
             {
                 Debug.Log($"Pick Up");
                 _inHandObject = _hit.collider.gameObject;
-                _inHandObject.transform.SetParent(_handsPoint,false);
+                _inHandObject.transform.SetParent(_handsPoint, false);
                 _inHandObject.transform.localRotation = Quaternion.Euler(Vector3.zero);
                 _inHandObject.transform.localPosition = Vector3.zero;
                 _inHandObject.transform.localScale = Vector3.one;
                 _inHandObject.GetComponent<Highlight>().EnableInHandsHighlight();
+                _isPickedUp = true;
             }
         }
 
@@ -125,7 +133,10 @@ namespace Player
 
             transform.Rotate(Vector3.up * mouseX);
         }
-
+        private void HighlightConstructItems()
+        {
+            
+        }
         private void HighlightPickableItems()
         {
             if (_hit.collider != null && _hit.collider.TryGetComponent(out IPickable pickable))

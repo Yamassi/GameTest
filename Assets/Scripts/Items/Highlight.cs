@@ -38,10 +38,10 @@ namespace Items
         public void EnableInHandsHighlight()
         {
             Color color = Color.white;
-            color.a = 0.5f;
+            color.a = 0.3f;
             foreach (var material in _materials)
             {
-                material.SetFloat("_Mode", 3);  // 3 - Transparent
+                material.SetFloat("_Mode", 3);
                 material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
                 material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
                 material.SetInt("_ZWrite", 0);
@@ -49,9 +49,11 @@ namespace Items
                 material.EnableKeyword("_ALPHABLEND_ON");
                 material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
                 material.renderQueue = 3000;
-                
+
+                material.SetColor("_Color", color);
+
                 material.EnableKeyword("_EMISSION");
-                material.SetColor("_EmissionColor", color);
+                material.SetColor("_EmissionColor", color * 0.5f);
             }
         }
 
@@ -68,6 +70,19 @@ namespace Items
         {
             foreach (var material in _materials)
             {
+                material.SetFloat("_Mode", 0);
+                material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One);
+                material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.Zero);
+                material.SetInt("_ZWrite", 1);
+                material.DisableKeyword("_ALPHABLEND_ON");
+                material.DisableKeyword("_ALPHATEST_ON");
+                material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                material.renderQueue = -1;
+
+                Color color = material.color;
+                color.a = 1f;
+                material.SetColor("_Color", color);
+
                 material.DisableKeyword("_EMISSION");
             }
         }
