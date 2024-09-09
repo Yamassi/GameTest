@@ -171,8 +171,8 @@ namespace Player
 
         private void ReplaceInHandObject()
         {
-            float offset = 0.5f;
-            Vector3 newPosition = _hit.point + Vector3.up * offset;
+            float offset = 0.49f;
+            Vector3 newPosition = _hit.point + _hit.normal * offset;
 
             _inHandObject.transform.position = newPosition;
             _inHandObject.transform.rotation = Quaternion.FromToRotation(Vector3.up, _hit.normal);

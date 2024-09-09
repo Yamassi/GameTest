@@ -81,7 +81,7 @@ namespace Player
             }
             else
             {
-                LookUpRayCast?.Invoke(hit);
+                LookUpRayCast?.Invoke(new RaycastHit());
             }
         }
 

@@ -13,7 +13,6 @@ namespace Items
 
         private const int DefaultLayer = 0, IgnoreRayCastLayer = 2;
         private const float DropDownOffset = 0.95f;
-
         public bool IsPutDownCorrectPlace { get; private set; }
 
         private void Awake()
@@ -47,14 +46,6 @@ namespace Items
             return gameObject;
         }
 
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.TryGetComponent(out Wall wall))
-            {
-                IsPutDownCorrectPlace = true;
-            }
-        }
-
         private void OnTriggerStay(Collider other)
         {
             if (other.TryGetComponent(out Wall wall))
@@ -67,7 +58,7 @@ namespace Items
         {
             if (other.TryGetComponent(out Wall wall))
             {
-                IsPutDownCorrectPlace = true;
+                IsPutDownCorrectPlace = false;
             }
         }
     }

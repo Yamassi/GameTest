@@ -10,7 +10,6 @@ namespace Items
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private BoxCollider _collider;
         private bool _isOnGround;
-
         private const int DefaultLayer = 0, IgnoreRayCastLayer = 2;
         private const float DropDownOffset = 0.95f;
         public bool IsPutDownCorrectPlace { get; private set; }
@@ -20,7 +19,7 @@ namespace Items
             _rigidbody = GetComponent<Rigidbody>();
             _collider = GetComponent<BoxCollider>();
             IsPutDownCorrectPlace = false;
-            _isOnGround = true;
+            _isOnGround = false;
         }
 
         public void PutDown(RaycastHit hit)
@@ -41,11 +40,9 @@ namespace Items
 
             gameObject.layer = DefaultLayer;
             transform.localScale = Vector3.one;
-
             transform.localRotation = Quaternion.Euler(new Vector3(0, transform.eulerAngles.y, 0));
             transform.SetParent(_pickUpItems, false);
             transform.position = newPosition;
-
             _collider.isTrigger = false;
         }
 
@@ -60,57 +57,27 @@ namespace Items
             return gameObject;
         }
 
-        private void OnTriggerEnter(Collider other)
-        {
-            if (other.TryGetComponent(out Brick brick))
-            {
-                IsPutDownCorrectPlace = IsCorrectBrickPlaceCheck(brick.transform);
-                _isOnGround = false;
-            }
-            else if (other.TryGetComponent(out Ground ground))
-            {
-                IsPutDownCorrectPlace = true;
-                _isOnGround = true;
-            }
-            else
-            {
-                IsPutDownCorrectPlace = false;
-            }
-        }
-
         private void OnTriggerStay(Collider other)
         {
-            if (other.TryGetComponent(out Brick brick))
-            {
-                IsPutDownCorrectPlace = IsCorrectBrickPlaceCheck(brick.transform);
-                _isOnGround = false;
-            }
-            else if (other.TryGetComponent(out Ground ground))
+            if (other.TryGetComponent(out Ground ground))
             {
                 IsPutDownCorrectPlace = true;
                 _isOnGround = true;
             }
-            else
+
+            if (other.TryGetComponent(out Brick brick))
             {
-                IsPutDownCorrectPlace = false;
+                IsPutDownCorrectPlace = IsCorrectBrickPlaceCheck(brick.transform);
+                _isOnGround = false;
             }
         }
 
         private void OnTriggerExit(Collider other)
         {
-            if (other.TryGetComponent(out Brick brick))
+            if (other.TryGetComponent(out Ground ground) || other.TryGetComponent(out Brick brick))
             {
                 IsPutDownCorrectPlace = false;
                 _isOnGround = false;
-            }
-            else if (other.TryGetComponent(out Ground ground))
-            {
-                IsPutDownCorrectPlace = false;
-                _isOnGround = true;
-            }
-            else
-            {
-                IsPutDownCorrectPlace = false;
             }
         }
 
@@ -120,10 +87,8 @@ namespace Items
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
     }
 }
