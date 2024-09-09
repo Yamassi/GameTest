@@ -706,7 +706,7 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 218416818}
     m_Modifications:
-    - target: {fileID: 2978226902185668329, guid: bb3cc1a2601984a70bffd891e7fcabe8, type: 3}
+    - target: {fileID: 4857132269700895538, guid: bb3cc1a2601984a70bffd891e7fcabe8, type: 3}
       propertyPath: _pickUpItems
       value: 
       objectReference: {fileID: 477257148}
@@ -750,14 +750,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5297700809011715869, guid: bb3cc1a2601984a70bffd891e7fcabe8, type: 3}
-      propertyPath: _pickUpItems
+    - target: {fileID: 5947619526954414217, guid: bb3cc1a2601984a70bffd891e7fcabe8, type: 3}
+      propertyPath: _renderers.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5947619526954414217, guid: bb3cc1a2601984a70bffd891e7fcabe8, type: 3}
+      propertyPath: _renderers.Array.data[0]
       value: 
-      objectReference: {fileID: 477257148}
-    - target: {fileID: 6018134697227723987, guid: bb3cc1a2601984a70bffd891e7fcabe8, type: 3}
-      propertyPath: _pickUpItems
-      value: 
-      objectReference: {fileID: 477257148}
+      objectReference: {fileID: 7285991919840948894}
     - target: {fileID: 7131363763966660810, guid: bb3cc1a2601984a70bffd891e7fcabe8, type: 3}
       propertyPath: m_Name
       value: Level
@@ -767,6 +767,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bb3cc1a2601984a70bffd891e7fcabe8, type: 3}
+--- !u!23 &7285991919840948894 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 7886699594200941269, guid: bb3cc1a2601984a70bffd891e7fcabe8, type: 3}
+  m_PrefabInstance: {fileID: 7285991919840948889}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

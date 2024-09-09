@@ -1,4 +1,4 @@
-using System;
+using Surfaces;
 using UnityEngine;
 
 namespace Items
@@ -8,27 +8,45 @@ namespace Items
     {
         [SerializeField] private Transform _pickUpItems;
         [SerializeField] private Rigidbody _rigidbody;
-        [SerializeField] private BoxCollider _boxCollider;
+        [SerializeField] private BoxCollider _collider;
+        private bool _isOnGround;
 
         private const int DefaultLayer = 0, IgnoreRayCastLayer = 2;
-
-        public bool IsCorrectPlace { get; private set; }
+        private const float DropDownOffset = 0.95f;
+        public bool IsPutDownCorrectPlace { get; private set; }
 
         private void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
-            _boxCollider = GetComponent<BoxCollider>();
-            IsCorrectPlace = true;
+            _collider = GetComponent<BoxCollider>();
+            IsPutDownCorrectPlace = false;
+            _isOnGround = true;
         }
 
-        public void PutDown(Vector3 position)
+        public void PutDown(RaycastHit hit)
         {
-            gameObject.layer = 0;
-            _boxCollider.isTrigger = false;
+            Vector3 newPosition;
+            if (_isOnGround)
+            {
+                float offset = 0.5f;
+                newPosition = hit.point + hit.normal * offset;
+            }
+            else
+            {
+                Bounds hitBounds = hit.collider.bounds;
+                Bounds pickableBounds = _collider.bounds;
+                newPosition = transform.position;
+                newPosition.y = hitBounds.max.y + pickableBounds.extents.y;
+            }
+
+            gameObject.layer = DefaultLayer;
             transform.localScale = Vector3.one;
-            transform.localRotation = Quaternion.Euler(Vector3.zero);
+
+            transform.localRotation = Quaternion.Euler(new Vector3(0, transform.eulerAngles.y, 0));
             transform.SetParent(_pickUpItems, false);
-            transform.position = position;
+            transform.position = newPosition;
+
+            _collider.isTrigger = false;
         }
 
         public GameObject PickUp()
@@ -38,7 +56,7 @@ namespace Items
             transform.localScale = Vector3.one;
             if (gameObject.layer == DefaultLayer)
                 gameObject.layer = IgnoreRayCastLayer;
-            _boxCollider.isTrigger = true;
+            _collider.isTrigger = true;
             return gameObject;
         }
 
@@ -46,7 +64,35 @@ namespace Items
         {
             if (other.TryGetComponent(out Brick brick))
             {
-                IsCorrectPlace = false;
+                IsPutDownCorrectPlace = IsCorrectBrickPlaceCheck(brick.transform);
+                _isOnGround = false;
+            }
+            else if (other.TryGetComponent(out Ground ground))
+            {
+                IsPutDownCorrectPlace = true;
+                _isOnGround = true;
+            }
+            else
+            {
+                IsPutDownCorrectPlace = false;
+            }
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            if (other.TryGetComponent(out Brick brick))
+            {
+                IsPutDownCorrectPlace = IsCorrectBrickPlaceCheck(brick.transform);
+                _isOnGround = false;
+            }
+            else if (other.TryGetComponent(out Ground ground))
+            {
+                IsPutDownCorrectPlace = true;
+                _isOnGround = true;
+            }
+            else
+            {
+                IsPutDownCorrectPlace = false;
             }
         }
 
@@ -54,7 +100,29 @@ namespace Items
         {
             if (other.TryGetComponent(out Brick brick))
             {
-                IsCorrectPlace = true;
+                IsPutDownCorrectPlace = false;
+                _isOnGround = false;
+            }
+            else if (other.TryGetComponent(out Ground ground))
+            {
+                IsPutDownCorrectPlace = false;
+                _isOnGround = true;
+            }
+            else
+            {
+                IsPutDownCorrectPlace = false;
+            }
+        }
+
+        private bool IsCorrectBrickPlaceCheck(Transform item)
+        {
+            if (Mathf.Abs(item.transform.position.y - transform.position.y) > DropDownOffset)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

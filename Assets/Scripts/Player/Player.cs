@@ -1,5 +1,7 @@
 using Items;
+using Surfaces;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Player
 {
@@ -18,7 +20,9 @@ namespace Player
         private Vector2 _moveDirection;
         private Vector2 _mouseDirection;
         private Vector3 _playerVelocity;
+        private float _rotate;
 
+        private const float _rotationSpeed = 150;
         private const float _minCameraView = -70, _maxCameraView = 80;
         private float _xRotation = 0f;
 
@@ -26,6 +30,7 @@ namespace Player
         private GameObject _inHandObject;
 
         private bool _isPickedUp;
+
 
         public void Initialize()
         {
@@ -37,6 +42,7 @@ namespace Player
             _input.LookUpMoveDirection += OnMouseMoveDirection;
             _input.LookUpRayCast += OnRaycast;
             _input.ClickRaycast += Interact;
+            _input.Rotate += OnRotate;
             _isPickedUp = false;
         }
 
@@ -46,9 +52,11 @@ namespace Player
             _input.LookUpMoveDirection -= OnMouseMoveDirection;
             _input.LookUpRayCast -= OnRaycast;
             _input.ClickRaycast -= Interact;
+            _input.Rotate -= OnRotate;
             _input.Clear();
         }
 
+        private void OnRotate(float rotate) => _rotate = rotate;
         private void OnRaycast(RaycastHit hit) => _hit = hit;
         private void OnMouseMoveDirection(Vector2 mouseDirection) => _mouseDirection = mouseDirection;
         private void OnInputMoveDirection(Vector2 moveDirection) => _moveDirection = moveDirection;
@@ -80,7 +88,6 @@ namespace Player
         private void Mouse()
         {
             LookUp();
-
             if (_isPickedUp)
             {
                 HighlightPutDownPlaces();
@@ -105,19 +112,13 @@ namespace Player
 
         private void PutDown(RaycastHit hit)
         {
-            if (hit.collider != null && hit.collider.TryGetComponent(out Ground ground))
-            {
-                Debug.Log("Put down");
-                IPickable pickable = _inHandObject.GetComponent<IPickable>();
-                if (pickable.IsCorrectPlace)
-                {
-                    float offset = 0.5f;
-                    Vector3 newPosition = hit.point + hit.normal * offset;
+            IPickable pickable = _inHandObject.GetComponent<IPickable>();
 
-                    pickable.PutDown(newPosition);
-                    _isPickedUp = false;
-                    _inHandObject = null;
-                }
+            if (_hit.collider != null && pickable.IsPutDownCorrectPlace)
+            {
+                pickable.PutDown(_hit);
+                _isPickedUp = false;
+                _inHandObject = null;
             }
         }
 
@@ -148,28 +149,23 @@ namespace Player
 
         private void HighlightPutDownPlaces()
         {
-            if (_hit.collider != null && _hit.collider.TryGetComponent(out Ground ground))
-            {
-                ReplaceInHandObject();
+            IPickable pickable = _inHandObject.GetComponent<IPickable>();
+            Highlight highlight = _inHandObject.GetComponent<Highlight>();
 
-                if (_inHandObject.GetComponent<IPickable>().IsCorrectPlace)
-                {
-                    _inHandObject.GetComponent<Highlight>().EnableСorrectPlaceHighlight();
-                }
-                else
-                {
-                    _inHandObject.GetComponent<Highlight>().EnableWrongPlaceHighlight();
-                }
-            }
-            else if (_hit.collider != null && _hit.collider.TryGetComponent(out Brick brick))
+            if (_hit.collider != null && pickable.IsPutDownCorrectPlace)
             {
                 ReplaceInHandObject();
-                _inHandObject.GetComponent<Highlight>().EnableWrongPlaceHighlight();
+                highlight.EnableСorrectPlaceHighlight();
+            }
+            else if (_hit.collider != null && !pickable.IsPutDownCorrectPlace)
+            {
+                ReplaceInHandObject();
+                highlight.EnableWrongPlaceHighlight();
             }
             else
             {
-                _inHandObject.GetComponent<IPickable>().PickUp();
-                _inHandObject.GetComponent<Highlight>().EnablePickUpHighlight();
+                pickable.PickUp();
+                highlight.EnablePickUpHighlight();
             }
         }
 
@@ -180,6 +176,23 @@ namespace Player
 
             _inHandObject.transform.position = newPosition;
             _inHandObject.transform.rotation = Quaternion.FromToRotation(Vector3.up, _hit.normal);
+
+            Rotate();
+        }
+
+        private void Rotate()
+        {
+            float rotationAmount = _rotate * _rotationSpeed;
+            rotationAmount = Mathf.Clamp(rotationAmount, -45f, 45f);
+
+            float currentYRotation = _inHandObject.transform.eulerAngles.y;
+
+            float targetRotationY = Mathf.Round(currentYRotation + rotationAmount);
+
+            _inHandObject.transform.eulerAngles = new Vector3(
+                _inHandObject.transform.eulerAngles.x,
+                targetRotationY,
+                _inHandObject.transform.eulerAngles.z);
         }
 
         private void HighlightPickableItems()

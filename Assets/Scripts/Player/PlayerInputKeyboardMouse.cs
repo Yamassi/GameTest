@@ -10,10 +10,11 @@ namespace Player
         public event Action<Vector2> LookUpMoveDirection;
         public event Action<RaycastHit> LookUpRayCast;
         public event Action<RaycastHit> ClickRaycast;
+        public event Action<float> Rotate;
 
         private CompositeDisposable _disposable;
         private Transform _transform;
-        private const float _hitRange = 20f;
+        private const float _hitRange = 15f;
         private const int IgnoreRayCastLayer = ~(1 << 2);
 
         public void Initialize(Transform transform)
@@ -36,7 +37,18 @@ namespace Player
                 MovementInput();
                 MouseInput();
                 MouseClick();
+                MouseScroll();
             }).AddTo(_disposable);
+        }
+
+        private void MouseScroll()
+        {
+            float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+
+            if (scrollInput != 0)
+            {
+                Rotate?.Invoke(scrollInput);
+            }
         }
 
         private void MouseClick()

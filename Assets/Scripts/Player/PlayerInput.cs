@@ -9,6 +9,7 @@ namespace Player
         public event Action<Vector2> LookUpMoveDirection;
         public event Action<RaycastHit> LookUpRayCast;
         public event Action<RaycastHit> ClickRaycast;
+        public event Action<float> Rotate;
         public void Initialize(Transform transform);
         public void Clear();
     }
