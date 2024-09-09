@@ -10,9 +10,11 @@ namespace Player
         public event Action<Vector2> LookUpMoveDirection;
         public event Action<RaycastHit> LookUpRayCast;
         public event Action<RaycastHit> ClickRaycast;
+
         private CompositeDisposable _disposable;
         private Transform _transform;
-        private const float _hitRange = 50f;
+        private const float _hitRange = 20f;
+        private const int IgnoreRayCastLayer = ~(1 << 2);
 
         public void Initialize(Transform transform)
         {
@@ -44,7 +46,7 @@ namespace Player
                 RaycastHit hit;
 
                 if (Physics.Raycast(_transform.position,
-                        _transform.TransformDirection(Vector3.forward), out hit, _hitRange))
+                        _transform.TransformDirection(Vector3.forward), out hit, _hitRange, IgnoreRayCastLayer))
                 {
                     ClickRaycast?.Invoke(hit);
                 }
@@ -61,7 +63,11 @@ namespace Player
             RaycastHit hit;
 
             if (Physics.Raycast(_transform.position,
-                    _transform.TransformDirection(Vector3.forward), out hit, _hitRange))
+                    _transform.TransformDirection(Vector3.forward), out hit, _hitRange, IgnoreRayCastLayer))
+            {
+                LookUpRayCast?.Invoke(hit);
+            }
+            else
             {
                 LookUpRayCast?.Invoke(hit);
             }
